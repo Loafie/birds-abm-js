@@ -145,7 +145,7 @@ const drawBird = (b) => {
     let x = ((((ticks + jO) % jP) / jP) * 2.0)
     let offset = oS * (- 1 * ((x - 1) ** 2) + 1)
     let r = (!b.baby ? b.r : b.r / 2.0)
-    let drawing = `<g transform="translate(${b.x} ${(b.y + offset)}) scale(${(b.fa == "left"  ? r : (-1.0 * r))} ${r})">
+    let drawing = `<g transform="translate(${b.x} ${(b.y - offset)}) scale(${(b.fa == "left"  ? r : (-1.0 * r))} ${r})">
     <path
        style="fill:#d45500;fill-opacity:1"
        d="m 0.04999999,0.50000005 v 0.05 l -0.1,0.1 H 0 l 0.04999999,-0.05 v 0.05 h 0.05 v -0.05 l 0.05,0.05 h 0.05 l -0.1,-0.1 v -0.05 z"/>
@@ -279,7 +279,9 @@ const drawMeter = (b) => {
 
 const drawSkull = (s) => {
 
-    let drawing = `<g transform="translate(${s.x} ${(s.y)}) scale(${s.r} ${s.r})">
+    let alpha = Math.max(0, (s.ds - ticks) / SKULL_PERSISTENCE);
+
+    let drawing = `<g opacity="${alpha}" transform="translate(${s.x} ${(s.y)}) scale(${s.r} ${s.r})">
         <ellipse
             fill="grey"
             cx="-1.8626451e-09"
@@ -350,7 +352,16 @@ const drawSkull = (s) => {
 }
 
 const drawEgg = (e) => {
-    let drawing = `<g transform="translate(${e.x} ${(e.y)}) scale(${e.r} ${e.r})">
+
+    let alpha = 1.0;
+    if (e.cracked) {
+        // Calculate remaining ticks until despawn
+        let remaining = (e.lT + HATCH_DELAY + BROKEN_EGG_PERSISTENCE) - ticks;
+        alpha = Math.max(0, remaining / BROKEN_EGG_PERSISTENCE);
+    }
+
+
+    let drawing = `<g opacity="${alpha}" transform="translate(${e.x} ${(e.y)}) scale(${e.r} ${e.r})">
    ${!e.cracked ? `<path
       fill="white"
       d="M 0,0.8 -0.21603371,0.7030383 -0.42,0.56428572 -0.5003567,0.33469516 -0.55,0.05 -0.45,-0.26428571 -0.3,-0.57857142 0,-0.7 0.3,-0.57857142 0.45454551,-0.25476178 0.55,0.05 0.51217115,0.30093959 0.42,0.56428572 0.21,0.70714286 Z"/>

@@ -26,8 +26,8 @@ const populateBirds = (n) => {
         const rf = Math.random() > 0.5 ? (Math.random() > 0.5 ? "blue" : "indigo") : (Math.random() > 0.5 ? "darkcyan" : "purple");
         const heading = Math.random() * 2.0 * Math.PI;
         const facing = (heading < (3.0 * Math.PI / 2.0) && heading > (Math.PI / 2.0)) ? "left" : "right"
-        const jumpPeriod = Math.floor(Math.random() * 10) + 100
-        const jumpOffset = Math.floor(Math.random() * 10)
+        const jumpPeriod = Math.floor(Math.random() * 10) + 15;
+        const jumpOffset = Math.floor(Math.random() * jumpPeriod);
         const lastSwitch = 0
         const lastUpdate = 0
         const growTime = Math.floor(GROW_UP_DELAY * (0.5 + (Math.random() * 0.5)))
@@ -97,7 +97,7 @@ const makeGrass= (n, spacing) => {
 };
 const moveBirds = () => {
     let fruitTrees = []
-    for (t of trees) {
+    for (let t of trees) {
         if (t.fruit && !t.be) fruitTrees.push(t);
     }
     let newBirds = []
@@ -180,7 +180,7 @@ const moveBirds = () => {
     eggs = newEggs
     birds = newBirds
     let newSkulls = []
-    for (s of skulls) {
+    for (let s of skulls) {
         if (s.ds > ticks) {
             newSkulls.push(s)
         }
@@ -207,9 +207,17 @@ const getEaten = (t) => {
     t.be = true
     t.rgT = ticks + EAT_DELAY
 }
-const update = () => {
+
+
+
+const stepSimulation = () => {
     growFruit()
     moveBirds()
+    ticks += 1
+}
+
+
+const render= () => {
     var stuff = '<svg id="main-draw-space" width="' + WIDTH + '" height="' + HEIGHT + '" style="border:4px solid black; background:#F0E68C">'
     let drawings = new Array()
     for (let g of grass) {
@@ -238,15 +246,14 @@ const update = () => {
     }
     stuff += '</svg>'
     document.getElementById("main").innerHTML = stuff;
-    ticks += 1
 };
 
 const makeBirdFromEgg = (e) => {
     const rr = 30;
     const heading = Math.random() * 2.0 * Math.PI;
     const facing = (heading < (3.0 * Math.PI / 2.0) && heading > (Math.PI / 2.0)) ? "left" : "right"
-    const jumpPeriod = Math.floor(Math.random() * 200) + 500
-    const jumpOffset = Math.floor(Math.random() * 500)
+    const jumpPeriod = Math.floor(Math.random() * 10) + 15;
+    const jumpOffset = Math.floor(Math.random() * jumpPeriod);
     const lastSwitch = ticks
     const growTime = ticks + GROW_UP_DELAY
     const energy = START_ENERGY
@@ -270,8 +277,63 @@ const makeBirdFromEgg = (e) => {
             fullT: 0 }
 };
 
-ticks = 0
-makeGrass(50, 20);
-populateBirds(20);
-makeTrees(20, 60);
-setInterval(update, 33);
+// Hook up the slider
+const speedSlider = document.getElementById("speedSlider");
+const speedDisplay = document.getElementById("speedDisplay");
+if (speedSlider) {
+    speedSlider.addEventListener("input", (e) => {
+        speed = parseFloat(e.target.value);
+        speedDisplay.textContent = speed === 0 ? "Paused" : `${speed.toFixed(1)}x`;
+    });
+}
+const update = (currentTime) => {
+    let delta = currentTime - lastTime;
+    lastTime = currentTime;
+    // Safety cap: prevents massive lag spikes if the tab was in the background
+    if (delta > 250) delta = 250;
+    // Scale delta by the speed slider
+    accumulator += delta * speed;
+    // Safety guard: execute at most 100 physics steps in a single frame
+    let steps = 0;
+    while (accumulator >= TIMESTEP && steps < 100) {
+        stepSimulation(); // growFruit(), moveBirds(), ticks++
+        accumulator -= TIMESTEP;
+        steps++;
+    }
+    render();
+    requestAnimationFrame(update);
+};
+
+let lastTime = performance.now();
+const TIMESTEP = 1000 / 30; // 33.3ms fixed simulation step
+let accumulator = 0;
+let speed = 1.0;
+
+const resetSimulation = () => {
+    // 1. Reset clocks and accumulator
+    ticks = 0;
+    accumulator = 0;
+    lastTime = performance.now();
+    // 2. Clear all entity pools
+    birds = [];
+    grass = [];
+    trees = [];
+    skulls = [];
+    eggs = [];
+    // 3. Re-seed the world
+    makeGrass(50, 20);
+    populateBirds(20);
+    makeTrees(20, 60);
+    // 4. Immediately paint the initial state
+    render();
+};
+// Hook up the button
+const resetBtn = document.getElementById("resetBtn");
+if (resetBtn) {
+    resetBtn.addEventListener("click", resetSimulation);
+}
+
+
+// Initial start
+resetSimulation();
+requestAnimationFrame(update);

@@ -67,8 +67,8 @@ const nearbyTrianglesFast = (
   }
 
   const getNearest = (me, group) => {
-     result = {e: null, d: Infinity}
-     for (g of group) {
+     let result = {e: null, d: Infinity}
+     for (let g of group) {
       let d = distanceBetween(me, g)
       if (d < result.d)
         result = {e: g, d: d };
@@ -77,8 +77,8 @@ const nearbyTrianglesFast = (
   }
 
   const getNearestFront = (me, group) => {
-    result = {e: null, d: Infinity}
-    for (g of group) {
+    let result = {e: null, d: Infinity}
+    for (let g of group) {
      let d = distanceBetween(me, {...g, y: g.y + 15})
      if (d < result.d)
        result = {e: g, d: d };
