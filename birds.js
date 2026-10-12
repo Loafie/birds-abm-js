@@ -216,8 +216,35 @@ const stepSimulation = () => {
     ticks += 1
 }
 
+const render = () => {
+    ctx.fillStyle = "#F0E68C"; // Khaki background
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-const render= () => {
+    let renderList = [];
+    for (let g of grass) renderList.push(drawGrass(g));
+    for (let t of trees) renderList.push(drawTree(t));
+    for (let b of birds) renderList = renderList.concat(drawWithWrap(drawBird, b));
+    for (let s of skulls) renderList = renderList.concat(drawWithWrap(drawSkull, s));
+    for (let e of eggs) renderList = renderList.concat(drawWithWrap(drawEgg, e));
+
+    // Sort all entities by Y for 2.5D isometric depth
+    renderList.sort((a, b) => a[0] - b[0]);
+
+    // Draw all sorted entities
+    for (let item of renderList) {
+        item[1](ctx);
+    }
+
+    // Draw HUD battery meters on top of adult birds
+    for (let b of birds) {
+        if (!b.baby) {
+            drawMeter(ctx, b);
+        }
+    }
+    renderSidePanel();
+};
+
+const renderOld = () => {
     var stuff = '<svg id="main-draw-space" width="' + WIDTH + '" height="' + HEIGHT + '" style="border:4px solid black; background:#F0E68C">'
     let drawings = new Array()
     for (let g of grass) {
@@ -314,6 +341,13 @@ const resetSimulation = () => {
     ticks = 0;
     accumulator = 0;
     lastTime = performance.now();
+    speed = 1.0;
+    if (speedSlider) {
+        speedSlider.value = 1;
+    }
+    if (speedDisplay) {
+        speedDisplay.textContent = "1.0x";
+    }
     // 2. Clear all entity pools
     birds = [];
     grass = [];
@@ -332,6 +366,89 @@ const resetBtn = document.getElementById("resetBtn");
 if (resetBtn) {
     resetBtn.addEventListener("click", resetSimulation);
 }
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const sideCanvas = document.getElementById("sideCanvas");
+const sideCtx = sideCanvas.getContext("2d");
+
+const BIRD_COLORS = ["blue", "indigo", "darkcyan", "purple"];
+
+const renderSidePanel = () => {
+    if (!sideCtx) return;
+
+    // 1. Clear side canvas (150 x 800)
+    sideCtx.fillStyle = "#ffffff";
+    sideCtx.fillRect(0, 0, 150, 800);
+
+    // 2. Header (centered at x = 75)
+    sideCtx.fillStyle = "#333333";
+    sideCtx.font = "bold 16px sans-serif";
+    sideCtx.textAlign = "center";
+    sideCtx.textBaseline = "top";
+    sideCtx.fillText("POPULATION", 75, 35);
+
+    sideCtx.font = "13px sans-serif";
+    sideCtx.fillStyle = "#666666";
+    sideCtx.fillText(`Total: ${birds.length}`, 75, 60);
+
+    // Divider line
+    sideCtx.strokeStyle = "#e5e5e5";
+    sideCtx.lineWidth = 1;
+    sideCtx.beginPath();
+    sideCtx.moveTo(20, 88);
+    sideCtx.lineTo(130, 88);
+    sideCtx.stroke();
+
+    // 3. Count active birds per color
+    const counts = { blue: 0, indigo: 0, darkcyan: 0, purple: 0 };
+    for (let b of birds) {
+        if (counts[b.fill] !== undefined) {
+            counts[b.fill]++;
+        }
+    }
+
+    // 4. Draw each bird icon & live counter
+    const startY = 145;
+    const rowSpacing = 95;
+
+    BIRD_COLORS.forEach((color, idx) => {
+        const y = startY + idx * rowSpacing;
+        const count = counts[color];
+        const isExtinct = count === 0;
+
+        // If population is 0, draw bird at 50% alpha
+        sideCtx.save();
+        if (isExtinct) {
+           // sideCtx.globalAlpha = 0.5;
+        }
+
+        // Bird icon centered at x = 42, slightly more compact radius (18px)
+        const iconBird = {
+            x: 42,
+            y: y,
+            r: 18,
+            fill: color,
+            fa: "right",
+            baby: false,
+            peck: false,
+            eU: true,
+            jO: 0,
+            jP: 100
+        };
+        const birdDrawable = drawBird(iconBird);
+        birdDrawable[1](sideCtx);
+        sideCtx.restore();
+
+        // Count number placed cleanly at x = 80 (red when extinct)
+        sideCtx.fillStyle = isExtinct ? "#e53935" : "#111111";
+        sideCtx.font = "bold 24px sans-serif";
+        sideCtx.textAlign = "left";
+        sideCtx.textBaseline = "middle";
+        sideCtx.fillText(count.toString(), 80, y);
+    });
+};
 
 
 // Initial start

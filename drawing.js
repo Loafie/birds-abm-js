@@ -1,3 +1,74 @@
+const grassPath = new Path2D("M -0.54615386,0.9 -0.8,0.25 l 0.38076923,0.5 -0.12692311,-0.7 0.38076923,0.65 v -0.8 l 0.12692311,0.7 0.25384617,-0.8 V 0.6 L 0.59615385,-0.05 0.46923077,0.65 0.85,0.2 0.46923077,0.9 Z");
+const treeTrunkPath = new Path2D("M -0.2,0.675 H 0.25 L 0.15,0.075 0.075,0.1 -0.025,0.15 -0.1,0.225 Z");
+
+const treeFoliageCenters = [
+    [-0.3, 0.0125],
+    [-0.125, -0.175],
+    [0.225, -0.175],
+    [0.0, 0.1875],
+    [0.3, 0.0625]
+];
+
+const treeFruitPositions = [
+    [-0.225, -0.125],
+    [-0.025, -0.325],
+    [0.225, -0.25],
+    [0.05, 0.025],
+    [-0.325, 0.125],
+    [-0.05, 0.25],
+    [0.325, 0.2],
+    [0.375, -0.05]
+];
+
+
+// Pre-compiled bird vector parts
+const birdFeetPath = new Path2D(
+    "M 0.05,0.5 v 0.05 l -0.1,0.1 H 0 l 0.05,-0.05 v 0.05 h 0.05 v -0.05 l 0.05,0.05 h 0.05 l -0.1,-0.1 v -0.05 z " +
+    "M -0.35,0.45 v 0.1 l -0.1,0.1 h 0.05 l 0.05,-0.05 v 0.05 h 0.05 v -0.05 l 0.05,0.05 h 0.05 l -0.1,-0.1 v -0.1 z"
+);
+
+const birdTailPeckPath = new Path2D("m 0.28126869,-0.18304756 0.23746262,-0.73390488 0.0757296,0.25364192 0.13422525,-0.20582698 0.10602149,0.3550987 -0.41782168,0.56675256 z");
+
+const birdTailNormalPath = new Path2D("m 0.325,-0.06470583 0.4375,-0.63529412 v 0.26470588 L 0.95,-0.5941176 v 0.37058824 L 0.3875,0.20000005 Z");
+
+const birdBeakPeckPath = new Path2D("m -0.75,-0.2 -0.15,0.1 0.05,0.2 0.2,-0.2 z");
+
+const birdBeakNormalPath = new Path2D("m -0.30000001,-0.44999995 -0.15,0.1 0.05,0.2 0.2,-0.2 z");
+
+const meterOutlinePath = new Path2D("M -0.5,-0.85 V 0.8 h 1 v -1.65 h -1 l 0.05,0.05 h 0.9 v 1.55 h -0.9 V -0.8");
+
+// Pre-compiled vector paths for skulls and eggs
+// Exact vector paths from skull.svg
+const skullBonePath1 = new Path2D("m -0.45,0.45 0.85,0.3 c 0,0 0.1,-0.05 0.05,-0.1 C 0.4,0.6 -0.4,0.35 -0.4,0.35 Z");
+const skullBonePath2 = new Path2D("m -0.45,0.65 0.85,-0.3 c 0,0 0.1,0.05 0.05,0.1 -0.05,0.05 -0.85,0.3 -0.85,0.3 z");
+const skullTeethPath = new Path2D(
+    "M -0.3,0.1 H 0.3 V 0.05 h -0.6 Z " +
+    "M -0.2,0 v 0.15 h 0.05 V 0 Z " +
+    "M -0.025,0 v 0.15 h 0.05 V 0 Z " +
+    "M 0.15,0.15 H 0.2 V 0 H 0.15 Z"
+);
+
+const eggWholeShellPath = new Path2D("M 0,0.8 L -0.216,0.703 -0.42,0.564 -0.5,0.335 -0.55,0.05 -0.45,-0.264 -0.3,-0.579 0,-0.7 0.3,-0.579 0.455,-0.255 0.55,0.05 0.512,0.301 0.42,0.564 0.21,0.707 Z");
+const eggCrackedShell1Path = new Path2D("M 0.345,0.1 0.1,0.25 l -0.2,-0.3 -0.15,0.3 -0.2,-0.2 -0.1,0.25 -0.195,-0.2 -0.006,0.018 0.051,0.283 0.08,0.23 0.203,0.139 L -0.2,0.868 0.011,0.774 0.22,0.631 0.312,0.368 0.351,0.118 Z");
+const eggCrackedShell2Path = new Path2D("M 0.32,0.943 L 0.019,0.822 -0.129,0.508 -0.225,0.211 -0.125,0.05 0.025,0.25 0.2,0.05 0.4,0.25 0.65,0.05 0.865,0.211 0.775,0.5 0.621,0.822 Z");
+
+// Speckle data [cx, cy, rx, ry]
+const eggWholeSpeckles = [
+    [-0.2, -0.3625, 0.1, 0.1125],
+    [-0.2375, 0.125, 0.1875, 0.225],
+    [0.175, -0.2625, 0.175, 0.2125],
+    [0.25, 0.25, 0.15, 0.175],
+    [-0.1, 0.55, 0.1, 0.125]
+];
+
+const eggCrackedSpeckles = [
+    [-0.4, 0.375, 0.1, 0.125],
+    [-0.175, 0.6, 0.125, 0.175],
+    [0.3625, 0.6, 0.1875, 0.225],
+    [0.65, 0.2875, 0.1, 0.1375],
+    [0.075, 0.35, 0.075, 0.0875]
+];
+
 const drawWithWrap = (method, object) => {
     let objects = [object]
     let drawings = new Array()
@@ -43,6 +114,38 @@ const drawWithWrap = (method, object) => {
 };
 
 const drawTree = (t) => {
+    const draw = (ctx) => {
+        ctx.save();
+        ctx.translate(t.x, t.y);
+        ctx.scale(t.r, t.r);
+        // 1. Trunk
+        ctx.fillStyle = "#502d16";
+        ctx.fill(treeTrunkPath);
+        // 2. Foliage (5 green ellipses)
+        ctx.fillStyle = "#22cc00";
+        ctx.beginPath();
+        for (let [cx, cy] of treeFoliageCenters) {
+            ctx.moveTo(cx + 0.275, cy);
+            ctx.ellipse(cx, cy, 0.275, 0.3125, 0, 0, Math.PI * 2);
+        }
+        ctx.fill();
+        // 3. Fruits (if grown)
+        if (t.fruit) {
+            ctx.fillStyle = t.fill;
+            ctx.beginPath();
+            for (let [fx, fy] of treeFruitPositions) {
+                ctx.moveTo(fx + 0.075, fy);
+                ctx.arc(fx, fy, 0.075, 0, Math.PI * 2);
+            }
+            ctx.fill();
+        }
+        ctx.restore();
+    };
+    return [t.y + (t.r * 0.675), draw];
+};
+
+
+const drawTreeOld = (t) => {
     let drawing = `
     <g transform="translate(${t.x} ${t.y}) scale(${t.r} ${t.r})">
         <path
@@ -139,6 +242,101 @@ const drawCircle = (c) => {
 };
 
 const drawBird = (b) => {
+    let jO = b.jO;
+    let jP = (!b.baby ? b.jP : (b.jP / 2.0));
+    let oS = (!b.baby ? 5 : 2.5);
+    let x = ((((ticks + jO) % jP) / jP) * 2.0);
+    let offset = oS * (-1 * ((x - 1) ** 2) + 1);
+    let r = (!b.baby ? b.r : b.r / 2.0);
+    let scaleX = (b.fa === "left" ? r : -r);
+
+    const draw = (ctx) => {
+        ctx.save();
+        ctx.translate(b.x, b.y - offset);
+        ctx.scale(scaleX, r);
+
+        // 1. Feet (orange)
+        ctx.fillStyle = "#d45500";
+        ctx.fill(birdFeetPath);
+
+        // 2. Main body circle
+        ctx.fillStyle = b.fill;
+        ctx.beginPath();
+        ctx.arc(-0.05, 0.05, 0.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 3. Belly/Chest (white ellipse)
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.ellipse(-0.1, 0.125, 0.35, 0.375, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 4. State: Pecking vs Normal
+        if (b.peck) {
+            // Head ellipse
+            ctx.fillStyle = b.fill;
+            ctx.beginPath();
+            ctx.ellipse(-0.64, -0.225, 0.30, 0.325, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Tail feathers
+            ctx.fill(birdTailPeckPath);
+
+            // Eye whites
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.ellipse(-0.8, -0.3, 0.09, 0.10, 0, 0, Math.PI * 2);
+            ctx.ellipse(-0.6, -0.3, 0.10, 0.10, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Beak
+            ctx.fillStyle = "#ff6600";
+            ctx.fill(birdBeakPeckPath);
+
+            // Pupils
+            ctx.fillStyle = "black";
+            ctx.beginPath();
+            ctx.arc(-0.85, -0.25, 0.05, 0, Math.PI * 2);
+            ctx.arc(-0.65, -0.25, 0.05, 0, Math.PI * 2);
+            ctx.fill();
+        } else {
+            // Head ellipse
+            ctx.fillStyle = b.fill;
+            ctx.beginPath();
+            ctx.ellipse(-0.25, -0.475, 0.30, 0.325, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Tail feathers
+            ctx.fill(birdTailNormalPath);
+
+            // Eye whites
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.ellipse(-0.405, -0.55, 0.095, 0.10, 0, 0, Math.PI * 2);
+            ctx.ellipse(-0.205, -0.55, 0.095, 0.10, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Beak
+            ctx.fillStyle = "#ff6600";
+            ctx.fill(birdBeakNormalPath);
+
+            // Pupils (eU = look up vs down)
+            const pupilY = b.eU ? -0.5 : -0.58;
+            ctx.fillStyle = "black";
+            ctx.beginPath();
+            ctx.arc(-0.4, pupilY, 0.05, 0, Math.PI * 2);
+            ctx.arc(-0.2, pupilY, 0.05, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.restore();
+    };
+
+    return [b.y + r * 0.65, draw];
+};
+
+
+const drawBirdOld = (b) => {
     let jO = b.jO
     let jP = (!b.baby ? b.jP : (b.jP / 2.0))
     let oS = (!b.baby ? 5 : 2.5)
@@ -236,6 +434,19 @@ const drawBird = (b) => {
 }
 
 const drawGrass = (g) => {
+    const draw = (ctx) => {
+        ctx.save();
+        ctx.translate(g.x, g.y);
+        ctx.scale(g.rx, g.ry);
+        ctx.fillStyle = g.fill;
+        ctx.fill(grassPath);
+        ctx.restore();
+    };
+    return [g.y + g.ry * 0.9, draw];
+};
+
+
+const drawGrassOld = (g) => {
     let drawing = `<g transform="translate(${g.x} ${(g.y)}) scale(${g.rx} ${g.ry})">
     <path
        style="fill:${g.fill}"
@@ -244,7 +455,31 @@ const drawGrass = (g) => {
     return [g.y + g.ry * 0.9, drawing]
 }
 
-const drawMeter = (b) => {
+const drawMeter = (ctx, b) => {
+    let color = "lime";
+    if (b.en > 100) { color = (ticks % 10 > 5) ? "#0000ff" : "#ffffff"; }
+    else if (b.en < 20) { color = (ticks % 10 > 5) ? "#ff0000" : "#ffffff"; }
+    const mx = (b.x + 25 + WIDTH) % WIDTH;
+    const my = (b.y - 25 + HEIGHT) % HEIGHT;
+    const mr = 14;
+    ctx.save();
+    ctx.translate(mx, my);
+    ctx.scale(mr, mr);
+    ctx.fillStyle = color;
+    ctx.fill(meterOutlinePath);
+    // Battery segments (simple filled bars)
+    if (b.en > 20)  ctx.fillRect(-0.4, 0.45, 0.8, 0.25);
+    if (b.en > 40)  ctx.fillRect(-0.4, 0.15, 0.8, 0.25);
+    if (b.en > 60)  ctx.fillRect(-0.4, -0.15, 0.8, 0.25);
+    if (b.en > 80)  ctx.fillRect(-0.4, -0.45, 0.8, 0.25);
+    if (b.en > 100) ctx.fillRect(-0.4, -0.75, 0.8, 0.25);
+    ctx.restore();
+};
+
+
+
+
+const drawMeterOld = (b) => {
     let color = ""
     if (b.en > 100) {ticks % 10 > 5 ? color = "#0000ff" : color = "#ffffff"}
     else if (b.en < 20) {ticks % 10 > 5 ?  color = "#ff0000" : color = "#ffffff"}
@@ -278,6 +513,65 @@ const drawMeter = (b) => {
 }
 
 const drawSkull = (s) => {
+    let alpha = Math.max(0, (s.ds - ticks) / SKULL_PERSISTENCE);
+
+    const draw = (ctx) => {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(s.x, s.y);
+        ctx.scale(s.r, s.r);
+
+        // 1. Grey Cranium
+        ctx.fillStyle = "#888888";
+        ctx.beginPath();
+        ctx.ellipse(0, -0.3625, 0.5, 0.4375, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(0, 0, 0.35, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 2. Grey Crossbones & 4 Knobs
+        ctx.fillStyle = "#878787";
+        ctx.fill(skullBonePath1);
+        ctx.fill(skullBonePath2);
+
+        ctx.beginPath();
+        ctx.arc(-0.45, 0.4, 0.15, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(0.45, 0.7, 0.15, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(-0.45, 0.7, 0.15, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(0.45, 0.4, 0.15, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 3. Black Eye Sockets
+        ctx.fillStyle = "#000000";
+        ctx.beginPath();
+        ctx.ellipse(-0.2, -0.4, 0.15, 0.1625, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.ellipse(0.2, -0.4, 0.15, 0.1625, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 4. Black Teeth
+        ctx.fill(skullTeethPath);
+
+        ctx.restore();
+    };
+
+    return [s.y + s.r * 0.65, draw];
+};
+
+const drawSkullOld = (s) => {
 
     let alpha = Math.max(0, (s.ds - ticks) / SKULL_PERSISTENCE);
 
@@ -352,6 +646,55 @@ const drawSkull = (s) => {
 }
 
 const drawEgg = (e) => {
+    let alpha = 1.0;
+    if (e.cracked) {
+        let remaining = (e.lT + HATCH_DELAY + BROKEN_EGG_PERSISTENCE) - ticks;
+        alpha = Math.max(0, remaining / BROKEN_EGG_PERSISTENCE);
+    }
+
+    const draw = (ctx) => {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(e.x, e.y);
+        ctx.scale(e.r, e.r);
+
+        if (!e.cracked) {
+            // Whole white shell
+            ctx.fillStyle = "white";
+            ctx.fill(eggWholeShellPath);
+
+            // Colored speckles
+            ctx.fillStyle = e.fill;
+            ctx.beginPath();
+            for (let [cx, cy, rx, ry] of eggWholeSpeckles) {
+                ctx.moveTo(cx + rx, cy);
+                ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+            }
+            ctx.fill();
+        } else {
+            // Cracked white shell pieces
+            ctx.fillStyle = "white";
+            ctx.fill(eggCrackedShell1Path);
+            ctx.fill(eggCrackedShell2Path);
+
+            // Colored speckles
+            ctx.fillStyle = e.fill;
+            ctx.beginPath();
+            for (let [cx, cy, rx, ry] of eggCrackedSpeckles) {
+                ctx.moveTo(cx + rx, cy);
+                ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+            }
+            ctx.fill();
+        }
+
+        ctx.restore();
+    };
+
+    return [e.y + e.r * 0.7, draw];
+};
+
+
+const drawEggOld = (e) => {
 
     let alpha = 1.0;
     if (e.cracked) {

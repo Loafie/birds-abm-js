@@ -1,19 +1,88 @@
 <!DOCTYPE html>
 <html>
-    <head><title>SVG Animation Test</title>
-</head>
+    <head>
+        <title>SVG Animation Test</title>
+        <style>
+            body {
+                margin: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                font-family: sans-serif;
+            }
+            /* Relative center column that holds the main canvas and controls dead center */
+            .main-column {
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            #sideCanvas {
+                position: absolute;
+                right: calc(100% + 15px); /* Positioned 15px to the left of the main canvas */
+                top: 0;
+                border: none;
+                background: #ffffff;
+            }
+            #canvas {
+                border: 4px solid black;
+                background: #F0E68C;
+            }
+            .controls {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                margin-top: 20px;
+                margin-bottom: 25px;
+            }
+            .controls label {
+                font-size: 18px;
+                font-weight: bold;
+            }
+            #speedDisplay {
+                font-size: 18px;
+                font-weight: normal;
+                min-width: 45px;
+                display: inline-block;
+            }
+            #speedSlider {
+                width: 220px;
+                height: 18px;
+                cursor: pointer;
+            }
+            #resetBtn {
+                padding: 7px 18px;
+                cursor: pointer;
+                border-radius: 6px;
+                border: 1px solid #bbb;
+                background: #f4f4f4;
+                font-size: 16px;
+                font-weight: 500;
+                transition: background 0.15s ease;
+            }
+            #resetBtn:hover {
+                background: #e2e2e2;
+            }
+        </style>
+    </head>
     <body>
-        <center>
-            <div id="main">
-            </div>
-            <div class="controls" style="display: inline-flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 15px; font-family: sans-serif;">
-                <label for="speedSlider" style="font-size: 14px; font-weight: bold;">
-                    Speed: <span id="speedDisplay" style="font-weight: normal; min-width: 35px; display: inline-block;">1.0x</span>
+        <div class="main-column">
+            <!-- Sidebar canvas anchored to the left -->
+            <canvas id="sideCanvas" width="150" height="800"></canvas>
+
+            <!-- Main canvas (dead-center on the page) -->
+            <canvas id="canvas" width="800" height="800"></canvas>
+
+            <!-- Controls (dead-center directly under the main canvas) -->
+            <div class="controls">
+                <label for="speedSlider">
+                    Speed: <span id="speedDisplay">1.0x</span>
                 </label>
-                <input type="range" id="speedSlider" min="0" max="5" step="0.1" value="1" style="width: 180px; cursor: pointer;">
-                <button id="resetBtn" style="padding: 5px 14px; cursor: pointer; border-radius: 4px; border: 1px solid #bbb; background: #f4f4f4; font-size: 13px;">Reset</button>
+                <input type="range" id="speedSlider" min="0" max="5" step="0.1" value="1">
+                <button id="resetBtn">Reset</button>
             </div>
-        </center>
+        </div>
+
         <script src="drawing.js"></script>
         <script src="abm-helpers.js"></script>
         <script src="birds.js"></script>
