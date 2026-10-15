@@ -318,16 +318,20 @@ const update = (currentTime) => {
     lastTime = currentTime;
     // Safety cap: prevents massive lag spikes if the tab was in the background
     if (delta > 250) delta = 250;
-    // Scale delta by the speed slider
-    accumulator += delta * speed;
-    // Safety guard: execute at most 100 physics steps in a single frame
-    let steps = 0;
-    while (accumulator >= TIMESTEP && steps < 100) {
-        stepSimulation(); // growFruit(), moveBirds(), ticks++
-        accumulator -= TIMESTEP;
-        steps++;
+
+    if (!helpOpen) {
+        // Scale delta by the speed slider
+        accumulator += delta * speed;
+        // Safety guard: execute at most 333 physics steps in a single frame
+        let steps = 0;
+        while (accumulator >= TIMESTEP && steps < 333) {
+            stepSimulation(); // growFruit(), moveBirds(), ticks++
+            accumulator -= TIMESTEP;
+            steps++;
+        }
+        render();
     }
-    render();
+
     requestAnimationFrame(update);
 };
 
@@ -335,6 +339,22 @@ let lastTime = performance.now();
 const TIMESTEP = 1000 / 30; // 33.3ms fixed simulation step
 let accumulator = 0;
 let speed = 1.0;
+let helpOpen = false;
+
+const helpBtn = document.getElementById("helpBtn");
+const helpOverlay = document.getElementById("helpOverlay");
+const tutorialCanvas = document.getElementById("tutorialCanvas");
+if (helpBtn) {
+    helpBtn.addEventListener("click", () => {
+        helpOpen = !helpOpen;
+        helpOverlay.classList.toggle("active", helpOpen);
+        tutorialCanvas.classList.toggle("active", helpOpen);
+        // Reset lastTime so delta doesn't spike when help is closed
+        lastTime = performance.now();
+        accumulator = 0;
+    });
+}
+
 
 const resetSimulation = () => {
     // 1. Reset clocks and accumulator
@@ -418,30 +438,53 @@ const renderSidePanel = () => {
         const count = counts[color];
         const isExtinct = count === 0;
 
-        // If population is 0, draw bird at 50% alpha
-        sideCtx.save();
         if (isExtinct) {
-           // sideCtx.globalAlpha = 0.5;
+            // 1. Draw bird onto a small offscreen canvas at full opacity
+            const offscreen = document.createElement("canvas");
+            const birdSize = 80; // Large enough to contain the bird icon
+            offscreen.width = birdSize;
+            offscreen.height = birdSize;
+            const offCtx = offscreen.getContext("2d");
+
+            const iconBird = {
+                x: birdSize / 2,
+                y: birdSize / 2,
+                r: 18,
+                fill: color,
+                fa: "right",
+                baby: false,
+                peck: false,
+                eU: true,
+                jO: 0,
+                jP: 100
+            };
+            const birdDrawable = drawBird(iconBird);
+            birdDrawable[1](offCtx);
+
+            // 2. Stamp the flattened image onto the side canvas at 50% alpha
+            sideCtx.save();
+            sideCtx.globalAlpha = 0.5;
+            sideCtx.drawImage(offscreen, 42 - birdSize / 2, y - birdSize / 2);
+            sideCtx.restore();
+        } else {
+            // Normal: draw directly onto the side canvas at full opacity
+            const iconBird = {
+                x: 42,
+                y: y,
+                r: 18,
+                fill: color,
+                fa: "right",
+                baby: false,
+                peck: false,
+                eU: true,
+                jO: 0,
+                jP: 100
+            };
+            const birdDrawable = drawBird(iconBird);
+            birdDrawable[1](sideCtx);
         }
 
-        // Bird icon centered at x = 42, slightly more compact radius (18px)
-        const iconBird = {
-            x: 42,
-            y: y,
-            r: 18,
-            fill: color,
-            fa: "right",
-            baby: false,
-            peck: false,
-            eU: true,
-            jO: 0,
-            jP: 100
-        };
-        const birdDrawable = drawBird(iconBird);
-        birdDrawable[1](sideCtx);
-        sideCtx.restore();
-
-        // Count number placed cleanly at x = 80 (red when extinct)
+        // Count text (red if extinct)
         sideCtx.fillStyle = isExtinct ? "#e53935" : "#111111";
         sideCtx.font = "bold 24px sans-serif";
         sideCtx.textAlign = "left";

@@ -63,6 +63,61 @@
             #resetBtn:hover {
                 background: #e2e2e2;
             }
+            #helpBtn {
+                position: absolute;
+                bottom: calc(4px + 10px);
+                right: calc(4px + 10px);
+                width: 52px;
+                height: 52px;
+                border-radius: 50%;
+                border: 2px solid rgba(0,0,0,0.5);
+                background: rgba(255,255,255,0.85);
+                color: #333;
+                font-size: 30px;
+                font-weight: bold;
+                line-height: 1;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0.5;
+                transition: opacity 0.15s ease;
+                user-select: none;
+                z-index: 10;
+            }
+            #helpBtn:hover {
+                opacity: 1.0;
+            }
+            #helpOverlay {
+                position: absolute;
+                inset: 0;                          /* Covers the entire canvas wrapper */
+                background: rgba(0, 0, 0, 0.55);
+                display: none;
+                z-index: 9;                        /* Below the ? button (z-index 10) */
+                pointer-events: none;              /* Clicks still reach the ? button */
+            }
+            #helpOverlay.active {
+                display: block;
+            }
+            #tutorialCanvas {
+                position: absolute;
+                /* Center within the 800x800 canvas: (800-600)/2 = 100px offset */
+                top: 100px;
+                left: 100px;
+                width: 600px;
+                height: 600px;
+                border: 3px solid #333;
+                border-radius: 8px;
+                background: #fff;
+                display: none;
+                z-index: 10;
+            }
+            #tutorialCanvas.active {
+                display: block;
+            }
+            #helpBtn {
+                z-index: 11; /* Above the tutorial canvas */
+            }
         </style>
     </head>
     <body>
@@ -70,15 +125,20 @@
             <!-- Sidebar canvas anchored to the left -->
             <canvas id="sideCanvas" width="150" height="800"></canvas>
 
-            <!-- Main canvas (dead-center on the page) -->
-            <canvas id="canvas" width="800" height="800"></canvas>
+            <!-- Main canvas wrapped with help button overlay -->
+            <div style="position: relative; display: inline-block; line-height: 0;">
+                <canvas id="canvas" width="800" height="800"></canvas>
+                <div id="helpOverlay"></div>
+                <canvas id="tutorialCanvas" width="600" height="600"></canvas>
+                <button id="helpBtn" title="How to play">?</button>
+            </div>
 
             <!-- Controls (dead-center directly under the main canvas) -->
             <div class="controls">
                 <label for="speedSlider">
                     Speed: <span id="speedDisplay">1.0x</span>
                 </label>
-                <input type="range" id="speedSlider" min="0" max="5" step="0.1" value="1">
+                <input type="range" id="speedSlider" min="0" max="10" step="0.1" value="1">
                 <button id="resetBtn">Reset</button>
             </div>
         </div>
